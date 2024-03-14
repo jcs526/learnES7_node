@@ -43,8 +43,14 @@ app.post('/answer/:chapter', async (req: Request, res: Response) => {
 
 
         res.json(response.data);
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        if (error instanceof Error) {
+            // error가 Error 객체의 인스턴스인 경우에만 message에 접근
+            console.log(error.message);
+        } else {
+            console.log(error);
+        }
+
         res.status(400);
         res.json({});
     }
