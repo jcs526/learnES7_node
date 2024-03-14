@@ -20,24 +20,34 @@ app.get('/', (req: Request, res: Response) => {
 
 app.post('/answer/:chapter', async (req: Request, res: Response) => {
 
-    const url: string = `http://${process.env.ELASTICSEARCH_SERVER}/${process.env.ELASTICSEARCH_INDEX}/_search`
-    const auth: string = process.env.ELASTICSEARCH_ID + ":" + process.env.ELASTICSEARCH_PWD;
-    const authorization: string = Buffer.from(auth, "utf8").toString("base64");
-    const options = {
-        url,
-        method: "POST",
-        headers: {
-            Authorization: "Basic " + authorization,
-            "Content-Type": "application/json",
-        },
-        data: req.body
-    };
+    try {
+
+        const url: string = `http://${process.env.ELASTICSEARCH_SERVER}/${process.env.ELASTICSEARCH_INDEX}/_search`
+        const auth: string = process.env.ELASTICSEARCH_ID + ":" + process.env.ELASTICSEARCH_PWD;
+        const authorization: string = Buffer.from(auth, "utf8").toString("base64");
+
+        console.log(url);
+
+        const options = {
+            url,
+            method: "POST",
+            headers: {
+                Authorization: "Basic " + authorization,
+                "Content-Type": "application/json",
+            },
+            data: req.body
+        };
 
 
-    const response = await axios(options);
+        const response = await axios(options);
 
 
-    res.send(response.data);
+        res.json(response.data);
+    } catch (err) {
+        console.error(err);
+        res.status(400);
+        res.json({});
+    }
 });
 
 app.listen(port, () => {
