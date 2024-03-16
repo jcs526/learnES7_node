@@ -14,11 +14,11 @@ app.use(express.json());
 // URL-encoded 형식의 요청을 파싱하는 미들웨어
 app.use(express.urlencoded({ extended: true }));
 
-app.get('learn-es7/', (req: Request, res: Response) => {
+app.get('/learn-es7/', (req: Request, res: Response) => {
     res.send('Typescript + Node.js + Express Server');
 });
 
-app.post('learn-es7/answer/:chapter', async (req: Request, res: Response) => {
+app.post('/learn-es7/answer/:chapter', async (req: Request, res: Response) => {
 
     try {
 
