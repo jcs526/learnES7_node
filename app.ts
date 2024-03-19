@@ -75,7 +75,7 @@ interface ESdata {
     "order_id"?: number,
     "products"?: product[],
     "sku"?: string[],
-    "taxful_total_price": number,
+    "taxful_total_price"?: number,
     "taxless_total_price"?: number,
     "total_quantity"?: number,
     "total_unique_products"?: number,
@@ -143,13 +143,13 @@ const gradingResult = (chapter: number, data: EsRes, parseQuery: EsQuery): boole
         return !!dataList.find((data: ESdata): boolean => data.customer_full_name === "Eddie Underwood");
     } else if (chapter === 4) {
         //taxful_total_price 필드의 값이 100 이상인 문서를 검색하세요.
-        return dataList.every((data: ESdata): boolean => data.taxful_total_price > 100);
+        return dataList.every((data: ESdata): boolean => typeof data.taxful_total_price === 'number' && data.taxful_total_price > 100);
     } else if (chapter === 5) {
         //customer_full_name 필드에서 'Mary'가 포함되어 있으면서 'Bailey'는 포함되지 않는 문서를 검색하세요.
         return dataList.every((data: ESdata): boolean => !!(data?.customer_full_name?.includes("Mary") && !data.customer_full_name.includes("Bailey")));
     } else if (chapter === 6) {
         //email 필드의 값이 정확히 'gwen@butler-family.zzz'이면서 taxful_total_price 필드 값이 100 이상인 문서를 검색하세요.
-        return dataList.every((data: ESdata): boolean => data.taxful_total_price > 100 && data.email === "gwen@butler-family.zzz");
+        return dataList.every((data: ESdata): boolean => typeof data.taxful_total_price === 'number' && data.taxful_total_price > 100 && data.email === "gwen@butler-family.zzz");
     } else if (chapter === 7) {
         //1. customer_full_name 필드 값이 Oliver Rios 이거나
         //2. day_of_week 필드값이 'Monday'이거나
@@ -164,7 +164,7 @@ const gradingResult = (chapter: number, data: EsRes, parseQuery: EsQuery): boole
             if (data.day_of_week === "Monday") {
                 conut += 1;
             }
-            if (data.taxful_total_price > 1000) {
+            if (typeof data.taxful_total_price === 'number' && data.taxful_total_price > 1000) {
                 conut += 1;
             }
             console.log(conut);
@@ -176,12 +176,15 @@ const gradingResult = (chapter: number, data: EsRes, parseQuery: EsQuery): boole
                 return false;
             }
         });
-    } else if (chapter === 9) {
+    } else if (chapter === 8) {
+        return dataList.every((data: ESdata): boolean => !!((typeof data.total_quantity === 'number' && data.total_quantity >= 4)
+            || ((typeof data.taxful_total_price === 'number' && data.taxful_total_price >= 200) && (data.day_of_week = "Monday"))));
+    } else if (chapter === 9) { //(total_quantity>=4) || (taxful_total_price>=200 && day_of_week="Monday")
         // manufacturer 필드의 값이 'Elitelligence' 또는 'Pyramidustries'인 문서를 검색하세요
         return dataList.every((data: ESdata): boolean => !!(data?.manufacturer?.includes("Elitelligence") || data?.manufacturer?.includes("Pyramidustries")));
     } else if (chapter === 10) {
         // user 필드의 값이 'r'로 시작하면서 중간에 'bb'가 들어간 문서를 검색하세요
-        return dataList.every((data: ESdata): boolean => /^r.*bb.*$/.test(data.user as string));
+        return dataList.every((data: ESdata): boolean => typeof data.user === 'string' && /^r.*bb.*$/.test(data.user));
     } else if (chapter === 11) {
         // >email 필드가 있는 문서를 검색하세요.
         return dataList.every((data: ESdata): boolean => Object.hasOwnProperty.call(data, "email"));
